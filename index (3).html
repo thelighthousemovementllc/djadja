@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dja Dja</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#04070a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dja Dja">
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="%23050a0e"/><g fill="none" stroke="%23e8c45c" stroke-width="5.4" stroke-linecap="round"><ellipse cx="32" cy="17.5" rx="9.5" ry="12"/><path d="M32 29.5V58"/><path d="M17.5 36.5h29"/></g></svg>'>
+<style>
+:root{
+  --bg:#04070a; --panel:#070f14; --line:rgba(201,162,39,.17);
+  --gold:#c9a227; --gold-l:#e8dcb0; --gold-b:#f0d27a;
+  --cy:#39d7d7; --cy-d:#1d6f76; --txt:#cfe9ea; --dim:#7fb3b6;
+  --ok:#4ad6a0; --bad:#e2664f;
+  --top:env(safe-area-inset-top,0px); --bot:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;overscroll-behavior-y:contain}
+body{padding:calc(var(--top) + 4px) 0 calc(var(--bot) + 104px);min-height:100vh}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(120% 60% at 50% -10%, rgba(57,215,215,.10), transparent 62%),
+             radial-gradient(90% 50% at 50% 108%, rgba(201,162,39,.09), transparent 60%)}
+.wrap{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:0 14px}
+
+/* ---------- crown: the winged disc ---------- */
+.crown{margin:0 -14px 2px;display:flex;justify-content:center;overflow:hidden}
+.crown img{width:118%;max-width:none;aspect-ratio:40/11;object-fit:cover;object-position:center 50%;
+  -webkit-mask-image:linear-gradient(to right,transparent 0,#000 10%,#000 90%,transparent 100%),
+                     linear-gradient(to bottom,transparent 0,#000 20%,#000 78%,transparent 100%);
+  -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(to right,transparent 0,#000 10%,#000 90%,transparent 100%),
+             linear-gradient(to bottom,transparent 0,#000 20%,#000 78%,transparent 100%);
+  mask-composite:intersect;
+  filter:saturate(1.06) contrast(1.06) brightness(1.05)
+         drop-shadow(0 0 16px rgba(201,162,39,.30))}
+
+/* ---------- hero: the royal bust in the rings ---------- */
+.hero{position:relative;width:206px;height:206px;margin:2px auto 12px}
+.hero .rings{position:absolute;inset:0;pointer-events:none}
+.hero .rings circle{fill:none;stroke:var(--cy)}
+.hero .rings .r1{stroke-width:.9;opacity:.5}
+.hero .rings .r2{stroke-width:.5;opacity:.35;stroke-dasharray:1.5 5;
+  transform-origin:50% 50%;animation:spin 26s linear infinite}
+.hero .rings .r3{stroke-width:.4;opacity:.22;stroke-dasharray:.8 9;
+  transform-origin:50% 50%;animation:spin 40s linear reverse infinite}
+.hero .glow{position:absolute;inset:-14%;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(57,215,215,.16) 0%,rgba(57,215,215,0) 66%)}
+.hero img{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:74%;height:74%;object-fit:cover;object-position:center 42%;
+  -webkit-mask-image:radial-gradient(ellipse 58% 64% at 50% 45%,#000 60%,transparent 88%);
+  mask-image:radial-gradient(ellipse 58% 64% at 50% 45%,#000 60%,transparent 88%);
+  filter:saturate(1.05) contrast(1.05) drop-shadow(0 0 20px rgba(57,215,215,.28))}
+.hero .base{position:absolute;left:50%;bottom:-2px;transform:translateX(-50%);
+  width:64%;height:16px;pointer-events:none}
+.hero .base ellipse{fill:none;stroke:var(--cy);opacity:.3;stroke-width:.7}
+
+/* ---------- header ---------- */
+header{display:flex;align-items:center;gap:11px;padding:10px 2px 14px}
+.mark{width:34px;height:34px;flex:0 0 auto;display:grid;place-items:center;border-radius:50%;
+  border:1px solid rgba(201,162,39,.4);background:rgba(201,162,39,.06)}
+.mark svg{width:17px;height:17px;color:var(--gold-b)}
+header h1{margin:0;font-size:16px;font-weight:600;letter-spacing:.24em;color:var(--gold-l)}
+header small{display:block;font-size:8.5px;letter-spacing:.2em;color:var(--dim);margin-top:2px}
+.live{margin-left:auto;text-align:right;font-size:8.5px;letter-spacing:.11em;color:var(--dim)}
+.live b{display:flex;align-items:center;justify-content:flex-end;gap:5px;font-weight:600;
+  font-size:9px;letter-spacing:.14em;color:var(--cy)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--cy);box-shadow:0 0 7px var(--cy);
+  animation:blip 2.2s infinite}
+.dot.off{background:var(--bad);box-shadow:0 0 7px var(--bad);animation:none}
+@keyframes blip{0%,100%{opacity:1}50%{opacity:.3}}
+.greet{padding:0 2px 14px;text-align:center}
+.greet .g1{font-size:17.5px;letter-spacing:.13em;color:var(--cy);font-weight:600}
+.greet .g2{font-size:9.5px;letter-spacing:.19em;color:var(--gold);margin-top:4px}
+
+/* ---------- panels ---------- */
+.panel{background:linear-gradient(160deg,rgba(9,20,26,.94),rgba(4,9,12,.94));
+  border:1px solid var(--line);border-radius:13px;padding:13px 14px;margin-bottom:12px;
+  box-shadow:0 1px 0 rgba(201,162,39,.06) inset}
+.panel h3{margin:0 0 11px;font-size:10px;font-weight:600;letter-spacing:.2em;color:var(--gold-l);
+  display:flex;align-items:center;gap:8px}
+.panel h3 .hint{margin-left:auto;font-size:8px;letter-spacing:.13em;color:var(--dim);font-weight:400}
+.note{font-size:10px;line-height:1.55;color:var(--dim);margin-top:9px}
+
+/* ---------- stat tiles ---------- */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px}
+.tile{background:linear-gradient(160deg,rgba(9,20,26,.94),rgba(4,9,12,.94));
+  border:1px solid var(--line);border-radius:13px;padding:12px 10px;text-align:center}
+.tile b{display:block;font-size:24px;font-weight:600;color:var(--gold-l);line-height:1.1}
+.tile b.cy{color:var(--cy)}
+.tile b.sm{font-size:15px;line-height:1.15;padding:5px 0 4px}
+.tile i{display:block;font-style:normal;font-size:7.5px;letter-spacing:.13em;color:var(--dim);margin-top:5px}
+
+.big{display:flex;gap:14px;margin-bottom:4px}
+.big>div{flex:1}
+.big b{display:block;font-size:22px;font-weight:600;color:var(--gold-l);line-height:1.15}
+.big i{display:block;font-style:normal;font-size:8px;letter-spacing:.13em;color:var(--dim);margin-top:3px}
+
+/* ---------- rows ---------- */
+.row{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(201,162,39,.09)}
+.row:last-child{border-bottom:0}
+.row .lbl{flex:0 0 96px;font-size:10px;letter-spacing:.05em;color:var(--dim);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .bar{flex:1;height:5px;border-radius:3px;background:rgba(201,162,39,.13);overflow:hidden}
+.row .bar span{display:block;height:100%;border-radius:3px;background:var(--gold);
+  transition:width .6s ease}
+.row .bar span.cy{background:var(--cy);box-shadow:0 0 6px rgba(57,215,215,.6)}
+.row .val{flex:0 0 auto;font-size:12px;color:var(--gold-l);min-width:30px;text-align:right}
+.row .sub{flex:0 0 auto;font-size:9px;color:var(--dim)}
+.row.stale .lbl{color:var(--bad)}
+
+/* ---------- sparkline ---------- */
+.spark{display:flex;align-items:flex-end;gap:2px;height:44px;margin:10px 0 6px}
+.spark span{flex:1;border-radius:1px;background:rgba(201,162,39,.55);min-height:2px}
+.spark span.now{background:var(--cy);box-shadow:0 0 7px rgba(57,215,215,.8)}
+
+/* ---------- activity ---------- */
+.job{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid rgba(201,162,39,.09)}
+.job:last-child{border-bottom:0}
+.job .pip{width:7px;height:7px;border-radius:50%;margin-top:5px;flex:0 0 auto;background:#666}
+.job .pip.running{background:var(--cy);box-shadow:0 0 8px var(--cy);animation:blip 1.4s infinite}
+.job .pip.queued{background:var(--gold)}
+.job .pip.done{background:var(--ok)}
+.job .pip.failed{background:var(--bad)}
+.job .body{flex:1;min-width:0}
+.job .t{font-size:11.5px;line-height:1.45;color:var(--txt)}
+.job .prog{height:3px;border-radius:2px;background:rgba(57,215,215,.14);margin:6px 0 4px;overflow:hidden}
+.job .prog span{display:block;height:100%;background:var(--cy);box-shadow:0 0 6px var(--cy);
+  transition:width .9s linear}
+.job .m{font-size:9px;letter-spacing:.08em;color:var(--dim);margin-top:2px}
+
+/* ---------- lead cards ---------- */
+.lead{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(201,162,39,.09)}
+.lead:last-child{border-bottom:0}
+.lead .av{width:30px;height:30px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;
+  font-size:11px;font-weight:600;color:var(--bg);background:linear-gradient(150deg,var(--gold-b),var(--gold))}
+.lead .n{font-size:12.5px;color:var(--gold-l)}
+.lead .s{font-size:9px;color:var(--dim);margin-top:2px;letter-spacing:.05em}
+.lead .w{margin-left:auto;font-size:9px;color:var(--cy);text-align:right;white-space:nowrap}
+
+/* ---------- the ankh ---------- */
+#ankh{position:fixed;right:18px;bottom:calc(var(--bot) + 18px);z-index:40;
+  width:70px;height:70px;border:0;padding:0;background:transparent;cursor:pointer}
+#ankh .disc{position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 42% 36%,#0d2229,#050d11 62%,#03080b);
+  border:1px solid rgba(201,162,39,.45);
+  box-shadow:0 6px 26px rgba(0,0,0,.6), 0 0 20px rgba(201,162,39,.3), inset 0 0 20px rgba(0,0,0,.9)}
+#ankh .ring{position:absolute;inset:-6px}
+#ankh .ring circle{fill:none;stroke:var(--cy);stroke-width:1.1;opacity:.5}
+#ankh .ring .d{stroke-dasharray:2 7;opacity:.75;transform-origin:50% 50%;
+  animation:spin 14s linear infinite}
+#ankh .gl{position:absolute;inset:0;display:grid;place-items:center}
+#ankh .gl svg{width:33px;height:33px;color:var(--gold-b);
+  filter:drop-shadow(0 0 7px rgba(232,196,92,.75))}
+#ankh .cap{position:absolute;left:50%;transform:translateX(-50%);bottom:-16px;font-size:7.5px;
+  letter-spacing:.12em;color:var(--dim);white-space:nowrap}
+#ankh.live .disc{border-color:rgba(57,215,215,.9);box-shadow:0 0 30px rgba(57,215,215,.6)}
+#ankh.live .gl svg{color:#a8f6f4;filter:drop-shadow(0 0 12px rgba(120,240,240,.95))}
+#ankh.live .ring .d{animation-duration:3.5s}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){#ankh *,.dot{animation:none!important}}
+
+/* ---------- misc ---------- */
+#toast{position:fixed;left:14px;right:104px;bottom:calc(var(--bot) + 22px);z-index:50;
+  background:rgba(7,15,20,.97);border:1px solid rgba(201,162,39,.35);border-radius:11px;
+  padding:11px 13px;font-size:11px;line-height:1.55;color:var(--txt);
+  opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none}
+#toast.on{opacity:1;transform:none}
+#toast b{color:var(--gold-l)}
+.pull{height:0;overflow:hidden;text-align:center;font-size:9px;letter-spacing:.14em;
+  color:var(--dim);transition:height .2s}
+.pull.on{height:26px;line-height:26px}
+.empty{font-size:10.5px;color:var(--dim);line-height:1.6;padding:4px 0}
+.setup{border:1px dashed rgba(201,162,39,.3);border-radius:11px;padding:12px;font-size:10.5px;
+  line-height:1.65;color:var(--dim)}
+.setup b{color:var(--gold-l);font-weight:600}
+#wakeBtn{width:100%;background:rgba(201,162,39,.09);border:1px solid rgba(201,162,39,.32);
+  border-radius:9px;color:var(--gold-l);font-size:10.5px;letter-spacing:.14em;padding:11px;
+  font-family:inherit;cursor:pointer}
+#wakeBtn.on{background:rgba(57,215,215,.12);border-color:rgba(57,215,215,.5);color:var(--cy)}
+.foot{text-align:center;font-size:8px;letter-spacing:.22em;color:rgba(127,179,182,.5);padding:6px 0 2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="pull" id="pull">RELEASE TO REFRESH</div>
+
+  <div class="crown"><img src="https://static.wixstatic.com/media/b51acd_b41fa5c7b0e742388e263425208e236c~mv2.png" alt="Winged sun disc"
+    onerror="this.parentElement.style.display='none'"></div>
+
+  <header>
+    <div>
+      <h1>DJA DJA</h1>
+      <small>ROYAL INTELLIGENCE SYSTEM</small>
+    </div>
+    <div class="live">
+      <b><span class="dot" id="dot"></span><span id="liveTxt">LIVE</span></b>
+      <span id="refreshed">—</span>
+    </div>
+  </header>
+
+  <div class="hero">
+    <span class="glow"></span>
+    <img src="https://static.wixstatic.com/media/b51acd_6e503206223f476795b4e773eeadcf1b~mv2.png" alt="Pharaoh" onerror="this.style.display='none'">
+    <svg class="rings" viewBox="0 0 100 100">
+      <circle class="r1" cx="50" cy="50" r="48.5"/>
+      <circle class="r2" cx="50" cy="50" r="45"/>
+      <circle class="r3" cx="50" cy="50" r="41"/>
+    </svg>
+    <svg class="base" viewBox="0 0 100 16">
+      <ellipse cx="50" cy="8" rx="46" ry="6"/><ellipse cx="50" cy="8" rx="30" ry="4"/>
+    </svg>
+  </div>
+
+  <div class="greet">
+    <div class="g1" id="greet">GOOD DAY, RENI</div>
+    <div class="g2">YOU COME FROM GREATNESS</div>
+  </div>
+
+  <div id="setupBox" style="display:none" class="panel">
+    <h3>NOT CONNECTED YET</h3>
+    <div class="setup">
+      These are your <b>last confirmed numbers</b>, not live ones — there is no bridge to ask yet.
+      The voice below is fully live; tap the ankh and talk to her now.
+      <div style="margin-top:10px;display:flex;gap:6px">
+        <input id="bu" placeholder="https://your-bridge…" autocapitalize="off" autocorrect="off"
+          style="flex:1;min-width:0;background:#04090c;border:1px solid rgba(201,162,39,.3);
+          border-radius:8px;color:#e8dcb0;padding:8px;font-size:11px">
+        <button id="bg" style="background:rgba(57,215,215,.14);border:1px solid rgba(57,215,215,.45);
+          border-radius:8px;color:#39d7d7;font-size:11px;padding:8px 12px">GO LIVE</button>
+      </div>
+      <div style="margin-top:7px">Paste the bridge address once it exists and this goes live
+      permanently — no new file needed.</div>
+    </div>
+  </div>
+
+  <div class="tiles">
+    <div class="tile"><b id="tContacts">—</b><i>CONTACTS</i></div>
+    <div class="tile"><b class="cy" id="tNew">—</b><i>NEW · 7D</i></div>
+    <div class="tile"><b id="tResp">—</b><i>AVG REPLY</i></div>
+  </div>
+
+  <div class="panel" id="pPipeline">
+    <h3>PIPELINE <span class="hint" id="hPipe">LIVE STAGES</span></h3>
+    <div id="pipeRows"><div class="empty">Waiting on the bridge…</div></div>
+  </div>
+
+  <div class="panel" id="pLeads" style="display:none">
+    <h3>RECENT LEADS <span class="hint" id="hLeads"></span></h3>
+    <div id="leadRows"></div>
+  </div>
+
+  <div class="panel" id="pSpend" style="display:none">
+    <h3>AD SPEND <span class="hint">LAST 30 DAYS</span></h3>
+    <div class="big">
+      <div><b id="sp30">—</b><i>SPENT · 30D</i></div>
+      <div><b id="spToday">—</b><i>TODAY</i></div>
+    </div>
+    <div class="spark" id="spark"></div>
+    <div id="spSrc"></div>
+    <div class="note" id="spNote"></div>
+  </div>
+
+  <div class="panel" id="pCpl" style="display:none">
+    <h3>COST PER LEAD <span class="hint">BY SOURCE</span></h3>
+    <div class="big">
+      <div><b id="cplAll">—</b><i>BLENDED</i></div>
+      <div><b id="cplLeads">—</b><i>LEADS · 30D</i></div>
+    </div>
+    <div id="cplRows"></div>
+    <div class="note" id="cplNote"></div>
+  </div>
+
+  <div class="panel" id="pWork">
+    <h3>DJA DJA IS WORKING <span class="hint" id="hWork">STANDBY</span></h3>
+    <div id="jobRows"><div class="empty">Nothing running.</div></div>
+  </div>
+
+  <div class="panel" id="wakeRow">
+    <h3>HANDS-FREE <span class="hint">WAKE WORD</span></h3>
+    <button id="wakeBtn"></button>
+    <div class="note wnote"></div>
+  </div>
+
+  <div class="foot">MIND · BODY · SPIRIT · PURPOSE</div>
+</div>
+
+<elevenlabs-convai id="elw" agent-id="agent_7901kz6fsg23fbfvgz178ca2q66b"
+  style="position:fixed;bottom:0;right:0;z-index:30;opacity:0;pointer-events:none"></elevenlabs-convai>
+<script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async></script>
+<div id="toast"></div>
+
+<button id="ankh" aria-label="Talk to Dja Dja">
+  <span class="disc"></span>
+  <svg class="ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="47"/><circle class="d" cx="50" cy="50" r="43"/></svg>
+  <span class="gl"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="5.4"
+    stroke-linecap="round"><ellipse cx="32" cy="17.5" rx="9.5" ry="12"/><path d="M32 29.5 L32 58"/>
+    <path d="M17.5 36.5 L46.5 36.5"/></svg></span>
+  <span class="cap" id="ankhCap">TAP TO TALK</span>
+</button>
+
+<script>
+/* The bridge rewrites these two when it serves the page. */
+const HASH = new URLSearchParams(location.hash.slice(1));
+const BRIDGE   = HASH.get('bridge') || ("__BRIDGE__".indexOf("__") === 0 ? "" : "__BRIDGE__");
+const READ_KEY = HASH.get('key')    || ("__READ_KEY__".indexOf("__") === 0 ? "" : "__READ_KEY__");
+
+/* Last confirmed reading from the Wix CRM. Shown until a bridge is connected,
+   and clearly labelled so it is never mistaken for a live number. */
+const SNAPSHOT = {
+  asOf: "Aug 4, 2026",
+  leads: {totalContacts:3, new7d:1, new30d:2, autoFiledPct:100, autoRepliedPct:100,
+          avgResponse:"< 60 sec"},
+  pipeline: [{stage:"New Lead",count:2},{stage:"Contacted",count:0},
+             {stage:"Consultation Booked",count:0},{stage:"Submitted to SUNRUN",count:0},
+             {stage:"Proposal Delivered",count:0},{stage:"Not Ready - Nurture",count:0},
+             {stage:"Closed",count:0}],
+  recentLeads: [{name:"R. Giles", source:"Website", stage:"New Lead", when:"Aug 2"},
+                {name:"J. Carter",  source:"Website", stage:"New Lead", when:"Jul 27"}],
+  metrics: {empty:true},
+  jobs: []
+};
+const AGENT    = "agent_7901kz6fsg23fbfvgz178ca2q66b";
+const BASE     = BRIDGE || location.origin;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function money(n){
+  if(n == null || isNaN(n)) return '—';
+  n = Number(n);
+  return '$' + n.toLocaleString('en-US',
+    {minimumFractionDigits: n < 100 ? 2 : 0, maximumFractionDigits: n < 100 ? 2 : 0});
+}
+function ago(ts){
+  if(!ts) return '';
+  const d = Math.floor(Date.now()/1000 - ts);
+  if(d < 60) return 'just now';
+  if(d < 3600) return Math.floor(d/60) + 'm ago';
+  if(d < 86400) return Math.floor(d/3600) + 'h ago';
+  return Math.floor(d/86400) + 'd ago';
+}
+function mmss(s){ s = Math.max(0, s|0); return s < 60 ? s + 's' : Math.floor(s/60) + 'm'; }
+
+function greet(){
+  const h = new Date().getHours();
+  $('greet').textContent = (h < 12 ? 'GOOD MORNING, RENI'
+                          : h < 18 ? 'GOOD DAY, RENI' : 'GOOD EVENING, RENI');
+}
+
+/* ---------------- rendering ---------------- */
+function bars(vals){
+  if(!vals || !vals.length){ $('spark').innerHTML = ''; return; }
+  const max = Math.max.apply(null, vals.concat([1]));
+  $('spark').innerHTML = vals.map((v,i) =>
+    `<span class="${i === vals.length-1 ? 'now' : ''}" style="height:${Math.max(2, Math.round(v/max*44))}px"></span>`
+  ).join('');
+}
+
+function rowList(el, list, fmt, accent){
+  if(!list || !list.length){ el.innerHTML = '<div class="empty">Nothing here yet.</div>'; return; }
+  const max = Math.max.apply(null, list.map(x => x.value || 0).concat([1]));
+  el.innerHTML = list.map(x =>
+    `<div class="row${x.stale ? ' stale' : ''}">
+       <span class="lbl">${esc(x.name).toUpperCase()}</span>
+       <span class="bar"><span class="${accent ? 'cy' : ''}" style="width:${Math.round((x.value||0)/max*100)}%"></span></span>
+       <span class="val">${fmt(x.value)}</span>
+       ${x.sub ? `<span class="sub">${esc(x.sub)}</span>` : ''}
+     </div>`).join('');
+}
+
+function draw(d){
+  // --- headline numbers
+  const L = (d.leads || {});
+  $('tContacts').textContent = L.totalContacts != null ? L.totalContacts : '—';
+  $('tNew').textContent      = L.new7d != null ? L.new7d : '—';
+  const resp = L.avgResponse || '—';
+  $('tResp').textContent = resp;
+  $('tResp').classList.toggle('sm', resp.length > 5);
+
+  // --- pipeline
+  const pipe = d.pipeline || [];
+  rowList($('pipeRows'), pipe.map(p => ({name:p.stage, value:p.count||0, stale:p.stale})),
+          v => v, false);
+  $('hPipe').textContent = pipe.reduce((a,b) => a + (b.count||0), 0) + ' IN PLAY';
+
+  // --- recent leads
+  const leads = d.recentLeads || [];
+  if(leads.length){
+    $('pLeads').style.display = '';
+    $('hLeads').textContent = leads.length + ' NEWEST';
+    $('leadRows').innerHTML = leads.slice(0,6).map(x =>
+      `<div class="lead">
+         <span class="av">${esc((x.name||'?').trim()[0] || '?').toUpperCase()}</span>
+         <span><span class="n">${esc(x.name || 'Unnamed')}</span>
+           <span class="s">${esc(x.source || 'Website')}${x.stage ? ' · ' + esc(x.stage) : ''}</span></span>
+         <span class="w">${esc(x.when || '')}</span>
+       </div>`).join('');
+  }
+
+  // --- money
+  const m = d.metrics;
+  if(m && !m.empty && m.spend){
+    $('pSpend').style.display = $('pCpl').style.display = '';
+    $('sp30').textContent    = money(m.spend.d30);
+    $('spToday').textContent = money(m.spend.today);
+    bars(m.spend.daily || []);
+    rowList($('spSrc'), (m.spend.bySource||[]).map(x => ({name:x.name, value:x.d30})), money, false);
+    $('spNote').textContent  = m.updatedAt ? 'Pulled ' + m.updatedAt : '';
+    const n = (m.leads && m.leads.d30) || 0;
+    $('cplAll').textContent   = n ? money((m.spend.d30||0)/n) : '—';
+    $('cplLeads').textContent = n || '—';
+    rowList($('cplRows'), (m.cpl||[]).map(x =>
+      ({name:x.source, value:x.cpl, sub:(x.leads||0) + ' leads'})), money, true);
+    $('cplNote').textContent  = m.cplNote || '';
+  }
+
+  // --- what she's doing
+  const jobs = d.jobs || [];
+  const busy = jobs.filter(j => j.status === 'running' || j.status === 'queued').length;
+  $('hWork').textContent = busy ? busy + ' ACTIVE' : 'CLEAR';
+  $('jobRows').innerHTML = jobs.length ? jobs.slice(0,6).map(j => {
+    const t = j.finished || j.started || j.created;
+    return `<div class="job">
+      <span class="pip ${j.status}"></span>
+      <span class="body">
+        <span class="t">${esc(j.summary || j.request).slice(0,140)}</span>
+        ${j.status === 'running'
+          ? `<span class="prog"><span style="width:${Math.round((j.progress||0)*100)}%"></span></span>` : ''}
+        <span class="m">${(j.status||'').toUpperCase()}${
+          j.status === 'running' && j.step ? ' · ' + esc(j.step).slice(0,38) : ''} · ${
+          j.status === 'running' && j.eta_s != null ? '~' + mmss(j.eta_s) + ' left' : ago(t)}</span>
+      </span></div>`;
+  }).join('') : '<div class="empty">Nothing running. Tap the ankh and give her something.</div>';
+
+  $('refreshed').textContent = 'UPDATED ' + new Date().toLocaleTimeString('en-US',
+    {hour:'numeric', minute:'2-digit'});
+}
+
+/* ---------------- data ---------------- */
+let failures = 0;
+async function load(){
+  try{
+    const r = await fetch(BASE.replace(/\/$/,'') + '/appdata',
+      {headers: READ_KEY ? {'X-Bridge-Key': READ_KEY} : {}, cache:'no-store'});
+    if(!r.ok) throw new Error(r.status);
+    draw(await r.json());
+    failures = 0;
+    $('dot').classList.remove('off');
+    $('liveTxt').textContent = 'LIVE';
+    $('setupBox').style.display = 'none';
+  }catch(e){
+    failures++;
+    draw(SNAPSHOT);
+    $('dot').classList.add('off');
+    $('liveTxt').textContent = 'SNAPSHOT';
+    $('refreshed').textContent = 'AS OF ' + SNAPSHOT.asOf.toUpperCase();
+    $('setupBox').style.display = '';
+  }
+}
+
+/* pull down at the top to refresh */
+let y0 = null;
+addEventListener('touchstart', e => { y0 = scrollY <= 0 ? e.touches[0].clientY : null; }, {passive:true});
+addEventListener('touchmove', e => {
+  if(y0 == null) return;
+  $('pull').classList.toggle('on', e.touches[0].clientY - y0 > 55);
+}, {passive:true});
+addEventListener('touchend', () => {
+  if($('pull').classList.contains('on')){ $('pull').classList.remove('on'); load(); }
+  y0 = null;
+}, {passive:true});
+
+document.addEventListener('visibilitychange', () => { if(!document.hidden) load(); });
+document.addEventListener('click', e => {
+  if(e.target.id !== 'bg') return;
+  const v = ($('bu').value || '').trim().replace(/\/$/, '');
+  if(!v) return;
+  location.hash = 'bridge=' + encodeURIComponent(v) + (READ_KEY ? '&key=' + encodeURIComponent(READ_KEY) : '');
+  location.reload();
+});
+greet(); draw(SNAPSHOT); load();
+setInterval(() => { if(!document.hidden) load(); }, 30000);
+setInterval(greet, 60000);
+
+/* ---------------- voice ---------------- */
+const btn = $('ankh'), cap = $('ankhCap');
+let Conversation = null, convo = null, recog = null, wakeOn = false;
+
+function setState(s, label){
+  btn.classList.toggle('live', s === 'live');
+  if(label) cap.textContent = label;
+}
+
+(async () => {
+  try{ ({ Conversation } = await import('https://esm.sh/@elevenlabs/client@0.9.0')); }
+  catch(e){
+    try{ ({ Conversation } = await import('https://cdn.jsdelivr.net/npm/@elevenlabs/client/+esm')); }
+    catch(e2){ Conversation = null; }
+  }
+})();
+
+function toast(msg, ms){
+  const t = $('toast');
+  t.innerHTML = msg;
+  t.classList.add('on');
+  clearTimeout(t._h);
+  t._h = setTimeout(() => t.classList.remove('on'), ms || 7000);
+}
+
+/* A microphone is only available in a secure context. Opened as a downloaded
+   file this is file:// — not secure — so voice genuinely cannot run here. */
+const CAN_MIC = window.isSecureContext && !!(navigator.mediaDevices &&
+                navigator.mediaDevices.getUserMedia);
+
+function openWidgetFallback(){
+  const el = document.getElementById('elw');
+  if(!el){ return false; }
+  el.style.opacity = '1';
+  el.style.pointerEvents = 'auto';
+  const hit = el.shadowRoot && el.shadowRoot.querySelector('button');
+  if(hit){ hit.click(); return true; }
+  return false;
+}
+
+async function startVoice(){
+  if(convo) return;
+  if(!CAN_MIC){
+    setState('', 'NEEDS LINK');
+    toast('<b>Voice needs a web address, not a downloaded file.</b> ' +
+          'Phones only allow the microphone over https. The moment your bridge is live, ' +
+          'open it from that link and the ankh works everywhere.', 11000);
+    return;
+  }
+  if(!Conversation){
+    setState('', 'OPENING');
+    if(!openWidgetFallback()){
+      toast('Could not reach the voice service. Check your signal and try again.', 6000);
+    }
+    setTimeout(() => setState('', 'TAP TO TALK'), 2500);
+    return;
+  }
+  setState('', 'CONNECTING');
+  try{
+    stopWake();
+    convo = await Conversation.startSession({
+      agentId: AGENT,
+      connectionType: 'webrtc',
+      onConnect:    () => setState('live','LISTENING'),
+      onModeChange: m  => setState('live', m && m.mode === 'speaking' ? 'SPEAKING' : 'LISTENING'),
+      onDisconnect: () => { convo = null; setState('', 'TAP TO TALK'); load(); startWake(); },
+      onError:      () => { convo = null; setState('', 'TAP TO TALK'); startWake(); }
+    });
+  }catch(err){ convo = null; setState('', 'MIC BLOCKED'); }
+}
+async function stopVoice(){
+  if(!convo) return;
+  try{ await convo.endSession(); }catch(e){}
+  convo = null; setState('', 'TAP TO TALK'); load(); startWake();
+}
+btn.addEventListener('click', () => convo ? stopVoice() : startVoice());
+
+/* "hey dja dja" — matched loosely, because speech recognition mangles the name */
+const WAKE = /\b(hey|hi|yo|ok|okay)?\s*(d(j|g)a[\s-]*d(j|g)a|jah?[\s-]*jah?|jada|jaja|ja[\s-]*ja|dad[\s-]*ja)\b/i;
+function startWake(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR || convo) return;
+  if(recog){ try{ recog.start(); }catch(e){} return; }
+  recog = new SR();
+  recog.continuous = true; recog.interimResults = true; recog.lang = 'en-US';
+  recog.onresult = e => {
+    for(let i = e.resultIndex; i < e.results.length; i++){
+      if(WAKE.test(e.results[i][0].transcript)){ startVoice(); return; }
+    }
+  };
+  recog.onerror = ev => { if(ev.error === 'not-allowed'){ wakeOn = false; setState('', 'TAP TO TALK'); } };
+  recog.onend   = () => { if(wakeOn && !convo) setTimeout(() => { try{ recog.start(); }catch(e){} }, 600); };
+  try{ recog.start(); wakeOn = true; setState('', 'HEY DJA DJA'); afterWakeChange(); }catch(e){}
+}
+function stopWake(){ wakeOn = false; if(recog){ try{ recog.stop(); }catch(e){} } }
+function afterWakeChange(){ try{ paintWake(); }catch(e){} }
+/* Wake-word listening is OPT-IN and off by default.
+   The old always-on listener restarted itself constantly, and each restart
+   re-asked for the microphone. Nothing listens now unless you switch it on. */
+const wakeRow = document.getElementById('wakeRow');
+const wakeBtn = document.getElementById('wakeBtn');
+function paintWake(){
+  const on = wakeOn;
+  wakeBtn.textContent = on ? 'LISTENING · TAP TO STOP' : 'OFF · TAP TO ENABLE';
+  wakeBtn.className = on ? 'on' : '';
+  wakeRow.querySelector('.wnote').textContent = on
+    ? 'Say "hey Dja Dja" any time this app is open.'
+    : 'Tap the ankh to talk. Enable this only if you want hands-free.';
+}
+wakeBtn.addEventListener('click', () => {
+  if(wakeOn){ stopWake(); wakeOn = false; setState('', 'TAP TO TALK'); }
+  else if(CAN_MIC){ startWake(); }
+  else { toast('Voice needs a secure web address to reach the microphone.', 7000); }
+  paintWake();
+});
+paintWake();
+
+setState('', CAN_MIC ? 'TAP TO TALK' : 'NEEDS LINK');
+
+
+</script>
+</body>
+</html>
